@@ -1,8 +1,24 @@
 clear;close all;clc;
 
-data=load('data');
-X=data(:,[1,2,3]);
-y=data(:,4);
+data_train=load('data_train');
+data_test=load('data_test');
+X_train=data_train(:,[1,2,3]);
+X_test=data_test(:,[1,2,3]);
+y_train=data_train(:,4);
 
-fprintf('\nProgram paused. Press enter to continue.\n');
-pause;
+[m_train,n]=size(X_train);
+[m_test]=size(X_test,1);
+X_train=[ones(m_train,1) X_train];
+X_test=[ones(m_test,1) X_test];
+
+initial_theta=zeros(n+1,1);
+%[initial_cost]=costFunction(initial_theta,X_train,y_train);
+
+options=optimset('GradObj','on','MaxIter',400);
+[theta,cost]=fminunc(@(t)(costFunction(t,X_train,y_train)),initial_theta,options);
+
+y_test=predict(theta,X_test);
+passenger_id=data_test(:,4);
+submit_predictions=[passenger_id y_test];
+
+save('submit_predictions.csv','submit_predictions');
